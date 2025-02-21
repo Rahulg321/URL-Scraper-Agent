@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@plugin "@tailwindcss/typography";
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -112,4 +113,13 @@ body {
 
 * {
   font-family: var(--font-geist-sans);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

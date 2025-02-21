@@ -1,0 +1,1 @@
+export type MARKDOWN_DATA_TYPE = "TEAM" | "LISTING";

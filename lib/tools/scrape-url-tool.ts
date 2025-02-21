@@ -1,6 +1,12 @@
 import { tool } from "ai";
 import { z } from "zod";
 import FirecrawlApp from "@mendable/firecrawl-js";
+import {
+  DataUnionSchema,
+  multipleTeamMemberSchema,
+  singleListingSchema,
+  singleTeamMemberSchema,
+} from "../schemas/data-union";
 
 const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 
@@ -16,30 +22,65 @@ export const scrapeUrlTool = tool({
     }
 
     console.log("Getting content for", url);
-    // const crawlResponse = await app.crawlUrl(url, {
-    //   limit: 100,
-    //   scrapeOptions: {
-    //     formats: ["markdown", "html"],
-    //   },
-    // });
+    // System prompt (high-level instructions to the LLM)
+    // const systemPrompt = `
+    //   You are a helpful AI that extracts structured data from markdown content.
+    //   You will produce a JSON array of objects, where each object can be either:
 
-    // if (!crawlResponse.success) {
-    //   throw new Error(`Failed to crawl: ${crawlResponse.error}`);
-    // }
+    //   1) A team object:
+    //     {
+    //       "type": "team",
+    //       "firstName": string,
+    //       "lastName": string,
+    //       "designation"?: string,
+    //       "linkedInUrl"?: string,
+    //       "detailPageUrl"?: string
+    //     }
 
-    // console.log(crawlResponse);
+    //   2) A listing object:
+    //     {
+    //       "type": "listing",
+    //       "title": string,
+    //       "description": string,
+    //       "state": string,
+    //       "category": string,
+    //       "revenue": string,
+    //       "listingCode": string,
+    //       "underContract": string,
+    //       "askingPrice": string,
+    //       "minimumEbitda": string,
+    //       "maximumEbitda": string,
+    //       "ebitda": string,
+    //       "price": string
+    //     }
 
-    const content = `something from ${url}   <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere delectus
-        est quam porro sint beatae magnam eveniet recusandae optio illum neque
-        voluptas, quae sapiente sed error aspernatur iste voluptatem et.
-        <ul>
-          <li>homedasdas</li>
-          <li>homedasdas</li>
-          <li>homedasdas</li>
-        </ul>
-      </p>`;
+    //   Return only valid JSON in your response. No extra text or keys. If a field is absent, return null.
+    // `;
 
-    return { url, content };
+    const userPrompt = `
+      Extract all valuable and useful content from the page. If the content
+    `;
+    const systemPrompt = `
+      You are an helpful AI Assistant that extracts structured data from a webpage.
+    `;
+
+    const crawlResponse = await app.extract([url], {
+      // schema: multipleTeamMemberSchema,
+      // schema: singleTeamMemberSchema,
+      systemPrompt,
+      prompt: userPrompt,
+    });
+
+    const content = JSON.stringify(crawlResponse);
+
+    if (!crawlResponse.success) {
+      throw new Error(`Failed to crawl and extract: ${crawlResponse.error}`);
+    }
+
+    // console.log("************************************************");
+    // console.log("Markdown extracted => ", crawlResponse);
+    // console.log("************************************************");
+
+    return { url, crawlResponse, content };
   },
 });
