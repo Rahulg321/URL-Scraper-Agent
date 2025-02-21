@@ -1,19 +1,13 @@
 import { tool } from "ai";
 import { z } from "zod";
-import InferMarkdownRawContent from "../actions/infer-markdown";
 import InferRawJson from "../actions/infer-raw-json";
 
 // the `tool` helper function ensures correct type inference:
-export const inferMarkdownContentTool = tool({
+export const inferJSONContentTool = tool({
   description:
-    "infer valuable content from the rough markdown file, extract as much valuable information as u can and present it in a structured way",
+    "Infer content from the provided JSON. If the situation requires inferring structured content from a raw JSON string then use this tool.",
   parameters: z.object({
     url: z.string().describe("The url to scrape content from"),
-    // markdown: z
-    //   .string()
-    //   .describe(
-    //     "The scraped content from the url, can include markdown or html format and plain text format"
-    //   ),
     content: z
       .string()
       .describe(
@@ -25,9 +19,10 @@ export const inferMarkdownContentTool = tool({
       throw new Error("content is required, could not find url");
     }
 
-    console.log("content Recieved in infer", content);
+    console.log("content Recieved in infer tool", content);
 
     const valuableContent = await InferRawJson(content);
+
     console.log(
       "valuable content inferred from AI server action",
       valuableContent

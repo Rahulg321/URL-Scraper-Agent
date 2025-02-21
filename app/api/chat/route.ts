@@ -1,4 +1,5 @@
-import { inferMarkdownContentTool } from "@/lib/tools/infer-content-tool";
+import { extractListingsFromUrl } from "@/lib/tools/extract-listings-from-url-tool";
+import { inferJSONContentTool } from "@/lib/tools/infer-content-tool";
 import { scrapeUrlTool } from "@/lib/tools/scrape-url-tool";
 import { displayWeather } from "@/lib/tools/weather-tool";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -22,17 +23,16 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
 
-    console.log("messages", messages);
-
     const result = streamText({
       model: openai("gpt-4o"),
       system: "You are a friendly assistant.",
       messages,
-      maxSteps: 5,
+      maxSteps: 6,
       tools: {
         displayWeather,
         scrapeUrlTool,
-        inferMarkdownContentTool,
+        inferJSONContentTool,
+        extractListingsFromUrl,
       },
       // onStepFinish({ text, toolCalls, toolResults, finishReason, usage }) {
       //   // your own logic, e.g. for saving the chat history or recording usage

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Weather } from "@/components/Weather";
 import { useState } from "react";
+import ChatSheetEditor from "@/components/chat-sheet-editor";
 
 export default function HomePage() {
   const [isStopping, setIsStopping] = useState(false);
@@ -73,9 +74,36 @@ export default function HomePage() {
 
                 if (state === "result") {
                   if (toolName === "displayWeather") {
+                    const { result } = toolInvocation;
+                    console.log("Weather tool Result", result);
                     return (
                       <div key={toolCallId} className="mt-3">
-                        <Weather {...toolInvocation.result} />
+                        <Weather {...result} />
+                      </div>
+                    );
+                  }
+
+                  if (toolName === "scrapeUrlTool") {
+                    const { result } = toolInvocation;
+                    console.log("Result", result);
+                    const items = result.items;
+                    console.log("items", items);
+                    return (
+                      <div key={toolCallId} className="mt-3">
+                        presenting tabular data
+                        <ChatSheetEditor data={items} />
+                      </div>
+                    );
+                  }
+
+                  if (toolName === "extractListingsFromUrl") {
+                    const { result } = toolInvocation;
+                    const items = result.items;
+                    console.log("listing items from url", items);
+                    return (
+                      <div key={toolCallId} className="mt-3">
+                        presenting tabular data
+                        <ChatSheetEditor data={items} />
                       </div>
                     );
                   }
@@ -85,13 +113,13 @@ export default function HomePage() {
                 return (
                   <div
                     key={toolCallId}
-                    className="flex items-center gap-2 mt-3 text-sm text-muted-foreground"
+                    className="flex items-center gap-2 text-sm text-muted-foreground"
                   >
                     <Loader className="h-4 w-4 animate-spin" />
                     {toolName === "displayWeather" &&
                       "Fetching weather data..."}
                     {toolName === "scrapeUrlTool" &&
-                      "Extracting content from URL..."}
+                      "Scraping content from URL..."}
                     {toolName === "inferMarkdownContentTool" &&
                       "Processing markdown content..."}
                   </div>

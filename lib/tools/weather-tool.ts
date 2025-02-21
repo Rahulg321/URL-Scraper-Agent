@@ -10,7 +10,7 @@ export const displayWeather = tool({
   execute: async ({ location }) => {
     console.log("Getting weather for", location);
     const temperature = 72 + Math.floor(Math.random() * 21) - 10;
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 20000));
     console.log("got it");
     return { weather: "Sunny", temperature, location };
   },

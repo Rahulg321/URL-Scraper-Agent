@@ -11,9 +11,9 @@ import {
 const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 
 // the `tool` helper function ensures correct type inference:
-export const scrapeUrlTool = tool({
+export const extractListingsFromUrl = tool({
   description:
-    "Scrape all content from the provided URL. If the content is valuable then extract it and return it in a structured way. If the situation requires getting content from a webpage then use this tool",
+    "Use this tool when the user wants to extract listings from a url by scraping. This tool will scrape the content from the provided URL and extract the listings from the page...",
   parameters: z.object({
     url: z.string().describe("The url to scrape content from"),
   }),
@@ -22,7 +22,7 @@ export const scrapeUrlTool = tool({
       throw new Error("URL is required, could not find url");
     }
 
-    console.log("Getting content for", url);
+    console.log("extracting listings from this url using the tool", url);
 
     const userPrompt = `
       Extract all valuable and useful content from the page
@@ -31,20 +31,21 @@ export const scrapeUrlTool = tool({
       You are an helpful AI Assistant that extracts structured data from a webpage.
     `;
 
-    // const crawlResponse = await app.extract([url], {
-    //   systemPrompt,
-    //   prompt: userPrompt,
-    // });
-
-    // Define schema to extract contents into
     const schema = z.array(
       z.object({
-        type: z.literal("team"),
-        firstName: z.string(),
-        lastName: z.string(),
-        designation: z.string().optional(),
-        linkedInUrl: z.string().optional(),
-        detailPageUrl: z.string().optional(),
+        type: z.literal("listing"),
+        title: z.string(),
+        description: z.string(),
+        state: z.string(),
+        category: z.string(),
+        revenue: z.string(),
+        listingCode: z.string(),
+        underContract: z.string(),
+        askingPrice: z.string(),
+        minimumEbitda: z.string(),
+        maximumEbitda: z.string(),
+        ebitda: z.string(),
+        price: z.string(),
       })
     );
 
@@ -58,10 +59,9 @@ export const scrapeUrlTool = tool({
       throw new Error(`Failed to crawl and extract: ${crawlResponse.error}`);
     }
 
-    console.log("crawlResponse", crawlResponse.json);
-
     // @ts-ignore
     const items = crawlResponse.json.items;
+    console.log("extract listings crawl response items", items);
 
     return { items };
   },
