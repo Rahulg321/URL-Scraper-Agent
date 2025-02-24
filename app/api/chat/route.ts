@@ -1,3 +1,4 @@
+import { addDealToDatabase } from "@/lib/tools/add-deal-db";
 import { extractListingsFromUrl } from "@/lib/tools/extract-listings-from-url-tool";
 import { inferJSONContentTool } from "@/lib/tools/infer-content-tool";
 import { scrapeUrlTool } from "@/lib/tools/scrape-url-tool";
@@ -33,6 +34,7 @@ export async function POST(req: Request) {
         scrapeUrlTool,
         inferJSONContentTool,
         extractListingsFromUrl,
+        addDealToDatabase,
       },
       // onStepFinish({ text, toolCalls, toolResults, finishReason, usage }) {
       //   // your own logic, e.g. for saving the chat history or recording usage
